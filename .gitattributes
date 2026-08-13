@@ -1,0 +1,5 @@
+# Development is Windows-first; these attributes exist so Windows-side checkouts
+# and edits (core.autocrlf) can never flip the sh scripts to CRLF, which breaks
+# them under POSIX sh on macOS/Linux clones and CI. Applies to git archive too,
+# which the sync script uses.
+hooks/** text eol=lf

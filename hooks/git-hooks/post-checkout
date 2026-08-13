@@ -1,0 +1,19 @@
+#!/bin/sh
+# Superproject hook: after a clone or branch switch, update submodules and sync
+# agentic-skills content into the project root. Install per the README (copy into
+# the repo's hooks path, or merge these lines into existing hooks). Requires no
+# edits: the agentic-skills submodule is found by path from .gitmodules.
+
+[ "$3" = "1" ] || exit 0   # branch checkouts only; skip single-file checkouts
+
+# Hooks can inherit git env vars (GIT_DIR under worktrees or `git -C`) that would
+# misdirect the submodule commands below; clear them.
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE
+
+git submodule update --init --recursive
+
+for p in $(git config -f .gitmodules --get-regexp '^submodule\..*\.path$' 2>/dev/null | awk '{print $2}'); do
+    if [ -f "$p/hooks/sync-agentic-skills.sh" ]; then
+        sh "$p/hooks/sync-agentic-skills.sh" "$p"
+    fi
+done
