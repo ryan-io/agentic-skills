@@ -7,7 +7,7 @@ description: >
   Default stack produces NUnit 4 tests with Moq for C#. Enumerates behaviors and edge cases
   first, writes Arrange-Act-Assert, mocks only at owned boundaries, and runs the suite green.
   For test-first pairing on a new design, use pipeline-stg6-implementation instead.
-tags: [testing, skill]
+tags: [skill, testing]
 ---
 
 # Unit Test Creation

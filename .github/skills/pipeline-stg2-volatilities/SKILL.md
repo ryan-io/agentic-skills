@@ -8,7 +8,7 @@ description: >
   decompose this", "what's likely to change", or presents a system to break down. Reads the
   design doc's Requirements section when present; writes its Volatilities section
   (docs/design/{slug}-design.md).
-tags: [design-pipeline, decomposition, skill]
+tags: [decomposition, design-pipeline, skill]
 ---
 
 # Pipeline Stage 2: Volatility-Based Decomposition

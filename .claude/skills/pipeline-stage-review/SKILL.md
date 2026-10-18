@@ -6,10 +6,12 @@ description: >
   plan completeness). Use on "critique this design", "review the plan before we build", "gate
   review", or "poke holes in the decomposition". Spawns the role-bound reviewer agent
   (gate-a-reviewer, gate-b-reviewer, gate-c-reviewer) where subagents are available; otherwise
-  runs the gate inline with an optional standalone handoff. The reviewer gets only the design
-  doc and governing records, never the author's rationale. Writes no design or code; returns a
-  verdict the pipeline acts on.
-tags: [design-pipeline, critique, skill]
+  runs the gate inline with an optional standalone handoff. Gates A and B add a verify step: the
+  matching verifier (design-review-verifier, plan-review-verifier) checks each finding before the
+  pipeline acts on it. After Gate C, pipeline-final-validation checks the whole picture. The
+  reviewer gets only the design doc and governing records, never the author's rationale. Writes
+  no design or code; returns a verdict the pipeline acts on.
+tags: [critique, design-pipeline, skill]
 ---
 
 # Pipeline Stage Review (the adversarial gates)
@@ -20,7 +22,7 @@ A design reaches code through the pipeline: pipeline-stg1-requirements, pipeline
 - **Gate B** (after stage 5): judges the plan. A design sound at Gate A does not always survive being turned into a plan.
 - **Gate C** (after stage 6): judges the built code against the design it claims to build. A fault here is a same-session fix before the increment closes: drifted code, a purity-boundary leak, a lifecycle fault the design forbade.
 
-The gate does not stop the workflow. It returns findings; the originating agent fixes them through the owning stage skill and re-runs the gate. The block is local: close the must-fix, re-run, proceed.
+The gate does not stop the workflow. It returns findings (verified first at Gates A and B); the originating agent fixes them through the owning stage skill and re-runs the gate. The block is local: close the must-fix, re-run, proceed.
 
 This skill adds no design or code substance. It carries the gate invocation and routing. The full reviewer briefs live in the agent definitions at `.claude/agents/` (Claude Code) and `.github/agents/*.agent.md` (GitHub Copilot).
 
@@ -58,14 +60,26 @@ Reviewer tool access: read-only for Gates A and B; Gate C adds build-and-test (`
 - Fires once `docs/design/{slug}-design.md` carries `## Requirements`, `## Volatilities`, `## Architecture`, and `## Validation` (the last from `pipeline-stg4-validation`). A standalone `pipeline-stg4-validation` run over a partial doc still invokes the gate; a missing upstream section is a reviewer finding, not a reason to skip the gate.
 - Hand `gate-a-reviewer` the design doc path (inline diagrams included) and the record list.
 - Its brief weights volatility fidelity above the other lenses (use-case fidelity, layering and seam soundness, simplicity and proportion, lifecycle soundness, impact and problem fit).
-- Verdict: READY or REVISE.
+- Verdict: READY or REVISE, then the verify step.
 
 ## Gate B: after the plan, before implementation
 
 - Fires once `pipeline-stg5-implementation-planning` has written the design doc's `## Implementation Plan` section.
 - Hand `gate-b-reviewer` the design doc path and the record list.
 - It checks plan-vs-design fidelity: every architecture service in the backlog with the right layer and placement; every named knob surviving into the tuning surface; every governing record honored as a checkable constraint; nothing in the plan contradicting the design.
-- Verdict: READY or REVISE.
+- Verdict: READY or REVISE, then the verify step.
+
+## Verify the review (Gates A and B)
+
+A reviewer can be wrong too: a misread section, an invented constraint, an inflated severity. A second adversary checks the first before anyone edits.
+
+- Hand the matching verifier (`design-review-verifier` at Gate A, `plan-review-verifier` at Gate B) the same starved context plus the reviewer's findings. Never the author's rationale.
+- It marks each finding CONFIRMED, REFUTED, or UNVERIFIABLE, checks each severity, sweeps for a missed must-fix, and returns STANDS or REVISE-REVIEW. The Gate B verifier also traces every requirement and architecture service into the plan.
+- Act only on CONFIRMED findings (and any missed must-fix the verifier adds), sorted as in "The verdict".
+- Drop a REFUTED finding; record the verifier's reason beside it in the reviewed section.
+- Turn an UNVERIFIABLE finding into a developer question.
+- REVISE-REVIEW: re-run the reviewer once with the verifier's notes. Then the orchestrator decides; no third loop.
+- Invocation follows the reviewer's: spawn where subagents exist; otherwise run inline, say so, and offer a standalone `@design-review-verifier` / `@plan-review-verifier` handoff.
 
 ## Gate C: after implementation, the post-build review
 
@@ -73,6 +87,7 @@ Reviewer tool access: read-only for Gates A and B; Gate C adds build-and-test (`
 - Hand `gate-c-reviewer` the diff, the built-code entry points, the design doc (including `## Implementation Plan` and `## Built log`), and the record list.
 - Lenses: correctness, design fidelity, plan completeness, the purity boundary (no pure-tier UI-framework reference), static-lifecycle safety (no static mutable state), robustness and test gaps, the tuning surface (no knob hardcoded that the plan put on a config seam), impact and problem fit, simplicity.
 - Verdict: CONFIRMED or REFUTED. The reviewer never fixes.
+- Single reviewer, no verify step: `pipeline-final-validation` covers the whole picture once Gate C closes.
 
 ## The verdict
 
@@ -86,6 +101,10 @@ Every line the verdict leaves in a record states the defect, the evidence, and t
 
 A clean gate is a valid and common result. Note that it ran, and proceed.
 
+## Final validation
+
+Once Gate C closes on a pipeline run, `pipeline-final-validation` runs the `pipeline-validator` over the whole design doc and the built code: requirements met by tested behavior, architecture and plan honored, gate must-fixes closed. A FAIL routes to the owning stage; a PASS is logged in `## Built log`.
+
 ## Boundaries
 
 - This skill critiques. It owns no artifact or code and writes none.
@@ -95,6 +114,6 @@ A clean gate is a valid and common result. Note that it ran, and proceed.
 
 ## References
 
-- The reviewer agent definitions: `.claude/agents/gate-a-reviewer.md`, `gate-b-reviewer.md`, `gate-c-reviewer.md` (Claude Code) and `.github/agents/gate-a-reviewer.agent.md`, `gate-b-reviewer.agent.md`, `gate-c-reviewer.agent.md` (GitHub Copilot): the briefs and tools (model bindings on the Claude side).
+- The reviewer agent definitions: `.claude/agents/gate-a-reviewer.md`, `gate-b-reviewer.md`, `gate-c-reviewer.md` (Claude Code) and `.github/agents/gate-a-reviewer.agent.md`, `gate-b-reviewer.agent.md`, `gate-c-reviewer.agent.md` (GitHub Copilot): the briefs and tools (model bindings on the Claude side). The verifiers `design-review-verifier` and `plan-review-verifier` live beside them.
 - Löwy, Juval. *Righting Software*. Addison-Wesley, 2019.
 - The pipeline it gates: `pipeline-stg1-requirements`, `pipeline-stg2-volatilities`, `pipeline-stg3-architecture`, `pipeline-stg4-validation`, `pipeline-stg5-implementation-planning`, `pipeline-stg6-implementation`.

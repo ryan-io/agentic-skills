@@ -60,7 +60,7 @@ Do not code from the plan alone. Confirm the records the plan names are still in
 
 ## The pairing loop
 
-Repeat per service, smallest useful increment at a time.
+Repeat per service, smallest useful increment at a time. Under an orchestrator that can spawn agents, the loop runs inside the `impl-worker` agent (Opus 5.5, fresh context) and the orchestrator navigates from the build report; a Fable or Opus seat never types the code itself (`agent-guardrails` Coding Delegation). Inline only where subagents are unavailable, and say so.
 
 ### 1. Pick the next unit
 
@@ -132,7 +132,7 @@ Drift is a signal. When code and architecture disagree, resolve it out loud: fix
 
 ## Close
 
-- Once the increment is green, invoke `pipeline-stage-review` at Gate C; a gate with no owner never fires. Close must-fix findings through the owning skill and re-run the gate before the increment closes.
+- Once the increment is green, invoke `pipeline-stage-review` at Gate C; a gate with no owner never fires. Close must-fix findings through the owning skill and re-run the gate before the increment closes. Once Gate C closes, `pipeline-final-validation` checks the whole run against the design doc before the increment is called done.
 - Summarize: what was implemented, what's left, any drift flagged into the design or a new ADR.
 - Update the plan section; append the `## Built log` entry. Record deferred or shortcut work in the plan's open items, pointing at the governing record.
 - Keep referenced diagrams current where their flows changed. Offer to continue next session.

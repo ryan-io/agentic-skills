@@ -7,7 +7,7 @@ description: >
   (sequence volatility) from Engines (activity volatility). Use for "the four questions",
   "Manager Engine ResourceAccess", "which layer", or "name this service". Consumes the design
   doc's Volatilities section; writes its Architecture section (docs/design/{slug}-design.md).
-tags: [design-pipeline, architecture, skill]
+tags: [architecture, design-pipeline, skill]
 ---
 
 # Pipeline Stage 3: Architecture Layering

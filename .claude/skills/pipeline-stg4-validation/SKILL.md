@@ -7,7 +7,7 @@ description: >
   "draw the call chains", or "is this the smallest set of services". Runs at the end of
   pipeline-stg3-architecture, before Gate A, and when a new use case arrives against a settled
   architecture. The author's proof, distinct from pipeline-stage-review's adversarial pass.
-tags: [design-pipeline, validation, skill]
+tags: [design-pipeline, skill, validation]
 ---
 
 # Pipeline Stage 4: Composable Design (architecture validation)

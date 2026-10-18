@@ -6,7 +6,7 @@ description: >
   editorial pass on a doc: bottom line up front, headers with bullets over paragraphs, verbs over
   nominalizations, no buzzwords, split long sentences. Preserves every fact, number, path,
   decision, trade-off, and caveat, and overwrites only after developer confirmation.
-tags: [documentation, writing, skill]
+tags: [documentation, skill, writing]
 ---
 
 # Concise Documentation
@@ -27,7 +27,7 @@ Documentation grows verbose, not terse. This skill retrofits an existing documen
 
 ## Consumable output
 
-For agent responses and action-oriented docs (plans, work orders, test plans), minimize the gap between reading and acting:
+For agent responses and action-oriented docs (plans, design docs, test plans), minimize the gap between reading and acting:
 
 - Lead with the action or conclusion.
 - Number multi-step work; one bounded action per step.

@@ -67,7 +67,7 @@ The plan is a gate, not a rubber stamp.
 
 - Grounding surfaced an unresolved conflict, a dependency on an undecided ADR, a missing decision, or a contradiction? Stop and put it in front of the developer before the plan is called done. Surface; don't resolve by guessing.
 - A new pattern, cross-cutting concern, or third-party dependency the plan would introduce is a developer decision first. Propose it, don't assume it.
-- When the plan is grounded and open questions are answered or accepted as risks: invoke `pipeline-stage-review` at Gate B as this skill's final step, and note in the plan that it ran. A gate with no owner never fires.
+- When the plan is grounded and open questions are answered or accepted as risks: invoke `pipeline-stage-review` at Gate B as this skill's final step, and note in the plan that it ran. A gate with no owner never fires. Its findings pass through `plan-review-verifier` (the verify step in `pipeline-stage-review`) before any is acted on.
 - Hand off to `pipeline-stg6-implementation` only after Gate B is clean.
 
 ## Revise an existing plan
