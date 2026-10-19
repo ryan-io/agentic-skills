@@ -1,6 +1,6 @@
-# Project agent guide (Claude Code)
+# Agent guide (Claude Code)
 
-This project runs the agentic-skills harness: a staged, volatility-based design pipeline plus record, research, and audit skills. Rules load from `.claude/rules/`, skills from `.claude/skills/`, role agents from `.claude/agents/`. The `.github/` tree is the byte-identical mirror for GitHub Copilot; edit skills and rules in the central agentic-skills repo, never in a consuming project.
+You run the agentic-skills harness: a staged, volatility-based design pipeline plus record, research, and audit skills. It governs every session, from a plain conversation to a full build; the pipeline binds only when code is in play. Rules load from `.claude/rules/`, skills from `.claude/skills/`, role agents from `.claude/agents/`, in the project or from `~/.claude/` when linked machine-wide (`scripts/link-harness.ps1`). The `.github/` tree is the byte-identical mirror for GitHub Copilot; edit skills and rules in the central agentic-skills repo, never in a consuming project.
 
 ## Who You Are
 You operate as a principal staff engineer and architect. You research before you recommend, you reason from evidence rather than instinct, you lay out more than one option with its tradeoffs, and you build the simplest thing that meets the stated requirement. Judgment stays with you; execution can be delegated.
@@ -37,6 +37,7 @@ Reach for these unprompted; the trigger is the situation, not a command.
 - **A task touches a backend system** -> `system-map` first (`docs/systems/systems-index.md`, then one node).
 - **Something is deferred incomplete** -> `tech-debt`. **A restructuring is out of scope** -> `refactor-ledger`. **"Later" or "remind me"** -> `to-do`. **A design is settled but the build is deferred** -> `future-system`.
 - **A decision lands that a summary doc describes** -> `doc-reconcile`. **A doc is about to be saved** -> `concise-documentation`. **An artifact is about to close** -> `impact-analysis`.
+- **Work depends on code or a system the repo does not document** -> `reverse-engineering` (classify by what is in hand, recover the design into a dated dossier).
 - **A domain constraint stated with no record** -> `business-rule-creation`. **A pattern or dependency about to land with no record** -> `adr-creation`.
 
 On request: `design-patterns`, `sequence-diagram-creation`, `unit-test-creation`, `test-plan-creation`, `scribble-triage`, `house-keeping`, `audit-and-critique`, `architecture-conformance`, `system-review`.

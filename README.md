@@ -105,6 +105,7 @@ Implicit skills fire on a situation; the description's first clause says when. O
 | `impact-analysis` | an artifact is about to close | findings only |
 | `concise-documentation` | a doc is about to be saved, or reads long | the named doc |
 | `lua-best-practices` | a `.lua` file is created or edited | review, setup scaffolds |
+| `reverse-engineering` | work depends on code or a system the repo does not document | `docs/reverse-engineering/` + `re-index.md`; guides per input kind in `.github/docs/` |
 | `design-patterns`, `sequence-diagram-creation`, `unit-test-creation`, `test-plan-creation` | on request | diagrams, tests, `docs/test-plans/` |
 | `scribble-triage` | `scribble.md` at the repo root has content | routes each line |
 | `house-keeping`, `audit-and-critique`, `architecture-conformance`, `system-review` | periodic, on request | `docs/reviews/` |
