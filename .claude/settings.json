@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "out=$(pwsh -NoProfile -File scripts/link-harness.ps1 2>&1); if ! printf \"%s\\n\" \"$out\" | grep -q \"^0 linked\"; then printf \"%s\\n\" \"$out\" | grep -v \"^skip\"; fi",
+            "timeout": 30,
+            "statusMessage": "Linking harness skills"
+          }
+        ]
+      }
+    ]
+  }
+}

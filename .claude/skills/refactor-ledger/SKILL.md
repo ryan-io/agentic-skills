@@ -21,7 +21,7 @@ A refactor candidate spotted mid-change has two bad exits: it widens the diff of
 ```
 | ID | Refactor | Solves | Evidence | Disposition | Status |
 |----|----------|--------|----------|-------------|--------|
-| RF-001 | Extract the shared retry policy | Two HTTP clients diverge on backoff | `OrderClient.cs`, `BillingClient.cs`; 6 call sites | investigated | open |
+| RF-001 | Extract the shared retry policy | Two HTTP clients diverge on backoff | `OrderClient`, `BillingClient`; 6 call sites | investigated | open |
 ```
 
 - **ID** `RF-NNN`: stable, never reused across ledger and archive.

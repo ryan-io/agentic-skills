@@ -14,7 +14,7 @@ tags: [design-pipeline, patterns, skill]
 
 Two jobs:
 
-1. Answer pattern questions from the catalog of 23 classic patterns: what each solves, when to use it, and how it lands in a codebase built on the pipeline's layers, Contracts interfaces, and composition-root DI (examples default to C#).
+1. Answer pattern questions from the catalog of 23 classic patterns: what each solves, when to use it, and how it lands in a codebase built on the pipeline's layers, Contracts interfaces, and composition-root DI (examples in the stack profile's language).
 2. Carry a per-stage lens the pipeline invokes. One question per stage, in that stage's vocabulary. No design logic of its own.
 
 The lens question: **is there a named pattern that already solves this, and does the design name it correctly?** It prevents two failures:
@@ -25,7 +25,7 @@ The lens question: **is there a named pattern that already solves this, and does
 ## Answering a pattern question
 
 - Lead with the pattern, then its project fit.
-- "What does X solve" or "Strategy or State here": give the intent, the distinguishing trait (State objects drive their own transitions; Strategy keeps algorithms independent), and a small reworked C# example.
+- "What does X solve" or "Strategy or State here": give the intent, the distinguishing trait (State objects drive their own transitions; Strategy keeps algorithms independent), and a small reworked example in the project's language.
 - "Should this seam be a Factory": the catalog is supporting evidence; the project's ADRs are the source of truth. Cite the intent, defer to the records, and apply the boundary below before recommending anything new.
 
 The catalog, for triage:
@@ -62,15 +62,23 @@ Two rules: the pattern's collaboration interface is a Contracts interface (Depen
 
 ### pipeline-stg6-implementation (the code)
 
-Build the named pattern in the language-native idiom. Prefer the C#/DI-native form over the textbook OO form:
+Build the named pattern in the language-native idiom. Prefer the language- and DI-native form over the textbook OO form:
+
+- One-method Strategy -> a function value (delegate, closure).
+- Iterator -> the language's native iteration (iterable, generator).
+- Observer -> the language's event mechanism or a pub/sub library.
+- Few operations -> pattern matching instead of a full Visitor, where the language has it.
+- Decorator chain -> scoped resources or middleware.
+
+Smells: a Singleton creeping in as a static; a Strategy interface with one implementation and no second in sight (speculative generality); a Visitor where a match expression reads better.
+
+#### C# profile
 
 - One-method Strategy -> delegate or `Func<>`.
 - Iterator -> `IEnumerable<T>` and `yield`.
-- Observer -> C# `event` or a pub/sub library.
-- Few operations -> pattern matching instead of a full Visitor.
-- Decorator chain -> `IDisposable` scopes or middleware.
-
-Smells: a Singleton creeping in as a static; a Strategy interface with one implementation and no second in sight (speculative generality); a Visitor where a `switch` expression reads better.
+- Observer -> C# `event`.
+- Few operations -> a `switch` expression.
+- Decorator chain -> `IDisposable` scopes.
 
 ### pipeline-stage-review (Gates A, B, C)
 
@@ -89,5 +97,5 @@ When a pattern becomes a committed project convention, record it as an ADR with 
 ## References
 
 - Gamma, Helm, Johnson, Vlissides. *Design Patterns*. Addison-Wesley, 1994.
-- Refactoring.Guru, https://refactoring.guru/design-patterns/csharp (rework examples; never copy).
+- Refactoring.Guru, https://refactoring.guru/design-patterns (per-language pages; C# profile: `/csharp`; rework examples, never copy).
 - The stages that invoke this lens: `pipeline-stg2-volatilities`, `pipeline-stg3-architecture`, `pipeline-stg5-implementation-planning`, `pipeline-stg6-implementation`, `pipeline-stage-review`.

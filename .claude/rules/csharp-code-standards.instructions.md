@@ -91,3 +91,7 @@ Extract a cohesive block of logic into its own class when it makes the host easi
 ## Testing
 
 NUnit 4 constraint model (`Assert.That`; legacy asserts in `NUnit.Framework.Legacy`). Projects `{ProjectName}.Tests`, one class per type (`FooServiceTests`). Names `Method_State_ExpectedBehavior` per `testing.instructions.md`. Moq, default Loose: verify outcomes, not call order. Factory methods for data. Author via the `unit-test-creation` skill.
+
+## Stack profile
+
+This file is the standards file for the `csharp` stack profile, selected in Repo Signals (`research.instructions.md`). The pipeline's checkable C# constraints (purity boundary, threading, tests, build commands) live in `.github/docs/csharp-code-standards-guide.md` § Stack profile.

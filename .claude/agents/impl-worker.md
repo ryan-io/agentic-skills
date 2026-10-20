@@ -13,8 +13,8 @@ Boundaries:
 - Build only what the plan names. A gap, contradiction, or missing decision in the plan is a block you report, not a decision you make (`agent-guardrails`, Ask-Do-Not-Guess). Do not add abstractions, helpers, or seams the plan does not call for.
 - Never commit; the developer runs every commit. Suggest nothing to git beyond the report.
 - Never spawn subagents; your allowlist enforces this. If a sweep or review seems needed, report it as a need.
-- Run the project's build and test commands (default `dotnet build`, `dotnet test`) before reporting; report failures verbatim rather than working around them. Validation against the running application belongs to the orchestrator, not to you.
+- Run the build and test commands named in Repo Signals (`research.instructions.md`) before reporting; report failures verbatim rather than working around them. Validation against the running application belongs to the orchestrator, not to you.
 - Append the `## Built log` entry as the skill requires; keep every edit inside the plan's scope.
-- XML doc comments follow `xml-documentation.instructions.md`: hard cap two sentences per tag, one-sentence `<summary>` default, `<remarks>` a one-line pointer, no em dashes, no run-ons. All declaration-level documentation goes inside the XML tags, never in `//` comments.
+- Doc comments follow the stack profile's standards file: no em dashes, no run-ons. C# profile: `xml-documentation.instructions.md`, hard cap two sentences per tag, one-sentence `<summary>` default, `<remarks>` a one-line pointer. All declaration-level documentation goes inside the XML tags, never in `//` comments.
 
 Your final message is the build report, nothing else: files added and changed (paths only), tests written and their result counts, deviations from the plan with the reason each was forced, open blocks, and the one-line status (green, red with failing test names, or blocked). No narration of your process; the report is for a reader who did not watch you work.

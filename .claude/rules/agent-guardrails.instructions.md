@@ -52,7 +52,7 @@ The following paths are load-bearing; do not reorganize without an ADR:
 
 ## Instruction File Integrity
 
-Agents must not edit files in `.github/instructions/` or `.claude/rules/` without explicit developer approval. Propose the change and get the developer's sign-off first. The two trees are mirrors, as are the two skills trees: when a change is approved for one, apply it to both in the same change set. A mirror pair that differs is itself a finding.
+Agents must not edit files in `.github/instructions/` or `.claude/rules/` without explicit developer approval. Propose the change and get the developer's sign-off first. One exception: `voice.instructions.md` is generated from `.github/docs/voices/` by `scripts/set-voice.sh`, and the `voice` skill regenerates it on a developer's `/voice <name>`. Hand edits go to the library file, never the generated one. The two trees are mirrors, as are the two skills trees: when a change is approved for one, apply it to both in the same change set. A mirror pair that differs is itself a finding.
 
 In a project consuming agentic-skills, the `.github/` and `.claude/` trees and `CLAUDE.md` are synced copies: the central repo's sync script overwrites local edits on the next run. Change them in the central agentic-skills repo, never in the consuming project. Project-specific skills, rules, and agents are additive files with distinct names; the sync never deletes them. The two entry points (`CLAUDE.md`, `.github/copilot-instructions.md`) are seeded only when absent and never overwritten; merge central updates into a project's own copies manually.
 

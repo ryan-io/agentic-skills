@@ -44,12 +44,14 @@ Sync semantics (`hooks/sync-agentic-skills.sh`, git + tar only):
   agents/                  <- Copilot custom agents (*.agent.md)
   instructions/            <- instruction files (SOURCE OF TRUTH)
   docs/                    <- templates (ADR, business rule) and companion guides
+  docs/voices/             <- voice library; one file per register, README holds the contract
 .claude/
   skills/                  <- mirror of .github/skills
   agents/                  <- Claude Code subagents
   rules/                   <- mirror of .github/instructions
 CLAUDE.md                  <- Claude Code entry point (seeded once)
 hooks/                     <- sync script, mirror script, hook files (never synced into projects)
+scripts/                   <- link-harness.ps1 (machine-wide junctions), set-voice.sh (swap the voice)
 ```
 
 ## Discovery: who reads what
@@ -66,7 +68,7 @@ Version floors: custom agents need VS 2026 18.4+; agent skills need VS 2026 18.5
 
 ## The entry points
 
-`CLAUDE.md` and `.github/copilot-instructions.md` carry the same stance in two dialects: who the agent is (principal staff engineer and architect: research first, options with tradeoffs, data over opinion, simplest solution), the non-negotiables (ADRs bind, never commit, mirrors move together), the pipeline, the implicit skill triggers, delegation, stack defaults, and the Concise Technical Writing standard with the Jarvis voice register. Deeper writing guidance: `.github/docs/writing-voice-guide.md`.
+`CLAUDE.md` and `.github/copilot-instructions.md` carry the same stance in two dialects: who the agent is (principal staff engineer and architect: research first, options with tradeoffs, data over opinion, simplest solution), the non-negotiables (ADRs bind, never commit, mirrors move together), the pipeline, the implicit skill triggers, delegation, stack defaults, and the Concise Technical Writing standard with a swappable voice register (default `jarvis`; see Voice below). Deeper writing guidance: `.github/docs/writing-voice-guide.md`.
 
 ## The design pipeline
 
@@ -107,6 +109,8 @@ Implicit skills fire on a situation; the description's first clause says when. O
 | `lua-best-practices` | a `.lua` file is created or edited | review, setup scaffolds |
 | `reverse-engineering` | work depends on code or a system the repo does not document | `docs/reverse-engineering/` + `re-index.md`; guides per input kind in `.github/docs/` |
 | `design-patterns`, `sequence-diagram-creation`, `unit-test-creation`, `test-plan-creation` | on request | diagrams, tests, `docs/test-plans/` |
+| `voice` | `/voice <name>`, "be more terse", "add a voice" | `voice.instructions.md` (generated), `.github/docs/voices/` |
+| `discover` | `/discover`, "what can you do", `/discover <name>` | one-screen catalog of the harness, self-checked against disk |
 | `scribble-triage` | `scribble.md` at the repo root has content | routes each line |
 | `house-keeping`, `audit-and-critique`, `architecture-conformance`, `system-review` | periodic, on request | `docs/reviews/` |
 
@@ -134,15 +138,16 @@ Reviewers get a starved context: artifacts plus governing records, never the aut
 
 ## Instruction files
 
-Universal (load everywhere): `agent-guardrails`, `code-standards`, `design-principles`, `research`, `pattern-fidelity`, `navigation`. Path-scoped: `testing`, `pr-review`, `csharp-code-standards`, `xml-documentation`, `lua-code-standards`, `adr-template` and `adr-pr-review` (`docs/adr/**`), `br-review` (`docs/business-rules/**`). Companion guides and templates live in `.github/docs/`.
+Universal (load everywhere): `agent-guardrails`, `code-standards`, `design-principles`, `research`, `pattern-fidelity`, `navigation`, and the generated `voice`. Path-scoped: `testing`, `pr-review`, `csharp-code-standards`, `xml-documentation`, `lua-code-standards`, `adr-template` and `adr-pr-review` (`docs/adr/**`), `br-review` (`docs/business-rules/**`). Companion guides and templates live in `.github/docs/`.
 
 ## Conventions
 
 - **ADRs bind.** `docs/adr/` is always obeyed; conflicts are blockers, and in review a contradiction is a must-fix.
 - **Mirror rule.** Edit under `.github/`, then `sh hooks/mirror-trees.sh` (or `--check` to verify) before committing. Agents are not mirrors (per-ecosystem frontmatter).
 - **Guardrails.** Ask-do-not-guess, options before answers, pipeline first, commit workflow, load-bearing paths, subagent spawning, coding delegation (all code is written by an Opus 5.5 worker with a fresh context, never by the orchestrator seat): `agent-guardrails.instructions.md`.
-- **Stack defaults.** C#, layered architecture (Client / Managers / Engines / ResourceAccess / Resources + Utilities), composition-root DI against `Contracts`, a pure business tier free of UI-framework references (WPF is the worked example), NUnit 4 + Moq. Project ADRs and instruction files override.
+- **Stack profiles.** Stack-neutral by default. A project names its profile in `research.instructions.md` Repo Signals: `csharp` (`csharp-code-standards.instructions.md` plus the guide's Stack profile section), `lua`, or `generic` (`code-standards` alone). The layered architecture vocabulary (Client / Managers / Engines / ResourceAccess / Resources + Utilities, composition-root DI against `Contracts`, a pure business tier) is language-neutral. Project ADRs and instruction files override.
 - **Writing.** Concise Technical Writing section of the entry points; `.github/docs/writing-voice-guide.md`; no em dashes; tags in skill frontmatter sorted.
+- **Voice.** The conversational register is one generated rule, `voice.instructions.md`, built from `.github/docs/voices/<name>.md`. Swap with `/voice <name>` in a session or `sh scripts/set-voice.sh <name>` (`--list`, `--current`). Shipped: `jarvis` (default), `neutral`, `terse`, `mentor`. A voice changes tone only; concision rules and neutral formal records hold in every voice.
 
 ## Extending
 

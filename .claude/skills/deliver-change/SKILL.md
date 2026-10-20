@@ -69,7 +69,7 @@ Ask one tight question at the block: the fork, the options, a recommendation. Th
 
 ## Phase 0: Pre-flight
 
-Read-only warm-up. Confirm the project's build and test commands run (default `dotnet build` / `dotnet test`). Close with a one-line readiness statement.
+Read-only warm-up. Confirm the project's build and test commands run (named in Repo Signals, `research.instructions.md`). Close with a one-line readiness statement.
 
 ## Phase 1: Select and ground
 

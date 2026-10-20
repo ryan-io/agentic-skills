@@ -18,3 +18,4 @@ How the agent gathers context and cites sources. Use it when a task is documenta
 ## Repo Signals
 Stable facts about this repository that research should assume rather than rediscover.
 Fill per project: primary language and version, framework, build and test commands, architecture style, where local docs live.
+Stack profile: name it here (`csharp`, `lua`, or `generic`); skills read the matching profile. `generic` means only `code-standards.instructions.md` applies.

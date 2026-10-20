@@ -57,7 +57,7 @@ The developer steers which mode is active.
 - Fixes and small refactors follow the `pipeline-stg6-implementation` pairing discipline without its plan machinery: small steps, narrate intent, pause at decision points, stay green.
 - The stack constraints hold at full strength: the pure tier never references a UI-framework assembly; constructor injection against `Contracts` interfaces in the composition root; no service locators; no static mutable state; never hand-edit generated files.
 - Pin changed logic with a cheap test where one fits. Skipping a test? Say so and why.
-- Run the project's build and test commands (default `dotnet build` / `dotnet test`) before calling an edit done.
+- Run the project's build and test commands (named in Repo Signals, `research.instructions.md`) before calling an edit done.
 
 ## The routing gate
 

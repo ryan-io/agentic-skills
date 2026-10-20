@@ -38,7 +38,7 @@ Volatility decomposition is the pipeline's core philosophy: encapsulate what cha
 ## Layering and seam soundness
 
 - Services sit in the right layer: Engines compute, Managers orchestrate, ResourceAccess reaches resources, Client is the Humble edge.
-- The pure tier holds no UI-framework reference (default C#/WPF stack: `PresentationFramework`, `WindowsBase`, `System.Windows.*`).
+- The pure tier holds no UI-framework reference (the stack profile names the assemblies or modules).
 - Contracts terminate the dependency arrows.
 - SOLID is heuristic, not gate: one reason to change per service, small segregated ports, dependence on contracts, and no service or port added only to satisfy a principle.
 

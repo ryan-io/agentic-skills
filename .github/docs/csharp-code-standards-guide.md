@@ -23,3 +23,48 @@ Reference: .NET "Choosing between class, record, and struct" and the framework s
 Why a hot path is held to a stricter bar than "Gen 0 is cheap" above: the two rules meet at the GC, not in contradiction. A single allocation is cheap; an allocation per iteration per item is a steady garbage stream, and that stream turns into collection pauses a user feels as latency spikes. So the hot path budgets allocations (reuse, pooling, `Span<T>`), while cold paths keep the benchmark-first rule and allocate freely for clarity.
 
 Availability: `Span<T>`, `ReadOnlySpan<T>`, `Memory<T>`, `ArrayPool<T>.Shared`, `stackalloc` into `Span<T>`, `string.Create`, and `MemoryMarshal` all work from `netstandard2.1` and .NET Core 2.1 up. `Span<T>` is stack-only (`ref struct`): it cannot be a class field, cross an `await`/`yield`, or be captured; use `Memory<T>` where the buffer must persist, slicing to `Span<T>` at the point of work.
+
+## Stack profile (pipeline constraints)
+
+The C# profile's checkable conditions. Pipeline skills and agents state the neutral rule and point here. A project selects this profile as `csharp` in Repo Signals (`research.instructions.md`).
+
+### Layers and projects
+
+- Client: a WPF app project (Humble Object Views, ViewModels, input wiring) plus an `Adapters` project that implements Contracts interfaces with WPF and framework types.
+- Managers, Engines, ResourceAccess: pure C# class libraries referencing only `Contracts`.
+- Project-reference graph: `rg -n '<ProjectReference' -g '*.csproj'`.
+
+### Purity boundary
+
+- The pure business tier (Contracts, Managers, Engines, ResourceAccess) never references WPF assemblies: `PresentationFramework`, `PresentationCore`, `WindowsBase`, `System.Windows.*`.
+- No business-tier csproj sets `UseWPF`.
+- Check both the csproj references and the `using` lines.
+
+### Composition and state
+
+- Every service registers in the composition root against its Contracts interface.
+- No service locators or static globals.
+- No static mutable state: no mutable static field or settable static property in the business tier. Constants and immutable caches are fine.
+
+### Threading
+
+- `async`/`await` throughout.
+- UI-thread marshaling (`Dispatcher`) only at the WPF edge.
+- Pure tier thread-agnostic: `ConfigureAwait(false)` on its awaits, with a `CancellationToken` threaded through.
+
+### Documentation
+
+- `///` XML doc comments per `xml-documentation.instructions.md`.
+- One-sentence verb-first `<summary>`; the governing record id in a short `<remarks>`; hard cap two sentences per tag.
+- All declaration-level documentation sits inside the XML tags, never in `//` comments.
+
+### Tests
+
+- NUnit 4 constraint model (`Assert.That`) with Moq, default Loose.
+- Test projects named `{Project}.Tests`; test names `Method_State_ExpectedBehavior`.
+- Full detail: `unit-test-creation` § C# profile.
+
+### Build and test
+
+- Repo Signals commands: `dotnet build` and `dotnet test`.
+- Green means both commands exit 0.

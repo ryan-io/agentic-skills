@@ -1,8 +1,8 @@
 ---
 name: pipeline-stg6-implementation
 description: >
-  Stage 6 of the design pipeline: pair-program a grounded plan into working code (default stack
-  C#/WPF). The agent drives, the developer navigates. Consumes the plan from
+  Stage 6 of the design pipeline: pair-program a grounded plan into working code. The agent
+  drives, the developer navigates. Consumes the plan from
   pipeline-stg5-implementation-planning (or the design doc directly), building named services one
   at a time, test first, against the design and governing records. Use on "implement this",
   "pair program", or "turn the design into code" once a plan or architecture exists. If no plan
@@ -18,7 +18,7 @@ A pairing session, not a batch generator.
 - The developer navigates: steers, reviews, makes the calls.
 - Work moves one service at a time, staying green, with the plan, the design doc, and the ADRs as the source of truth.
 
-Default stack: WPF client tier; business logic in pure C# class libraries under volatility decomposition; dependencies wired in one composition root against Contracts interfaces; `async`/`await` throughout with UI-thread marshaling only at the WPF edge; NUnit tests. A project that pins a different stack in its records overrides these defaults; the loop is stack-independent.
+Shape: a client tier over a pure business tier under volatility decomposition; dependencies wired in one composition root against Contracts interfaces; UI-thread marshaling only at the UI edge. Stack constraints come from the stack profile named in Repo Signals (`research.instructions.md`). C#: `.github/docs/csharp-code-standards-guide.md` § Stack profile; Lua: `lua-code-standards.instructions.md`; generic: `code-standards.instructions.md` only. A project's own records override its profile. The loop is stack-independent.
 
 ## Input
 
@@ -49,7 +49,7 @@ Do not code from the plan alone. Confirm the records the plan names are still in
 ## Setup
 
 - Confirm the `{slug}`. Load the plan and summarize the architecture back: services, layers, what each encapsulates. That summary is the backlog.
-- Check the codebase; work from what's on disk. Layout follows the decomposition: `Contracts` holds the interfaces and DTOs every arrow terminates on; pure-tier projects (Managers, Engines, ResourceAccess) reference only Contracts, never a UI-framework assembly (`PresentationFramework`, `WindowsBase`, `System.Windows.*` on the default stack); `Adapters` implements Contracts interfaces with UI and framework types.
+- Check the codebase; work from what's on disk. Layout follows the decomposition: `Contracts` holds the interfaces and DTOs every arrow terminates on; pure-tier projects (Managers, Engines, ResourceAccess) reference only Contracts, never a UI-framework assembly or module (the stack profile names them); `Adapters` implements Contracts interfaces with UI and framework types.
 - A needed project doesn't exist? Propose its name and reference set; confirm before creating. The project reference graph enforces the boundary.
 - Build order follows the volatility gradient in reverse (least volatile first, because everything above depends on it):
   1. ResourceAccess (atomic business verbs: config, content, persistence, settings)
@@ -76,15 +76,16 @@ Take the next service off the backlog. State what it encapsulates, its layer, it
 ### 3. Drive
 
 - Small steps: Contracts interface, implementation, test. Narrate intent briefly; pause at decision points.
-- Follow the project's code standards (`csharp-code-standards.instructions.md`, in `.github/instructions/` mirrored at `.claude/rules/`). Doc comments follow `xml-documentation.instructions.md`: one-sentence verb-first `<summary>`, governing record id in a short `<remarks>` where one applies, never a paragraph.
+- Follow `code-standards.instructions.md` plus the stack profile's standards file, in `.github/instructions/` mirrored at `.claude/rules/`.
+- Doc comments follow the stack's standards file: a one-sentence verb-first summary, the governing record id in a short note where one applies, never a paragraph. C# profile example: `xml-documentation.instructions.md`, with the record id in `<remarks>`.
 - Verify any framework or package API against documentation for the installed version; confirm a package's presence and version before coding against it.
-- Hold the constraints: pure tier never references a UI-framework assembly; every service registers in the composition root against its Contracts interface; no service locators or global state; UI-thread marshaling only at the UI edge; pure tier thread-agnostic (`ConfigureAwait(false)`) with a `CancellationToken` threaded through; no `static` mutable state.
+- Hold the constraints: pure tier never references a UI-framework assembly; every service registers in the composition root against its Contracts interface; no service locators or global state; UI-thread marshaling only at the UI edge; pure tier thread-agnostic, with cancellation threaded through where the runtime supports it; no static mutable state.
 - Never hand-edit generated files; regenerate from source.
 
 ### 4. Go green
 
 - Build, run the test, show the result. Red to green before moving on.
-- Pure-tier tests run headless (`dotnet test`, NUnit on the default stack). Prefer the pure tier: deterministic, fast, and the decomposition exists so logic is testable without the UI.
+- Pure-tier tests run headless through the Repo Signals test command, with the stack profile's test framework. Prefer the pure tier: deterministic, fast, and the decomposition exists so logic is testable without the UI.
 
 ### 5. Test for value, not coverage
 
@@ -93,7 +94,7 @@ Every unit that carries logic gets a test, but the test must earn its place. Cov
 - A test adds value when it pins a behavior, a contract, an ADR constraint, or a known bug. It adds nothing restating the implementation or asserting a trivial getter.
 - Test the pure tier hard: Engine computations and state transitions, ResourceAccess verbs, Manager orchestration, every ADR-imposed constraint bound to the service.
 - Don't test Humble Object Views or code-behind that only forwards; test the implementation behind the interface instead.
-- Mock only at owned boundaries (NUnit + Moq, Arrange-Act-Assert). Verify outcomes over interactions; over-mocking produces suites that pass while the app breaks.
+- Mock only at owned boundaries (Arrange-Act-Assert, with the profile's mocking library). Verify outcomes over interactions; over-mocking produces suites that pass while the app breaks.
 - Choosing not to test something? Say so and say why. That sentence is part of the increment.
 
 ### 6. Reflect on fidelity
@@ -104,7 +105,7 @@ Watch for the smells the layering stage named:
 - A Manager accreting domain logic: a god service forming. Push logic into an Engine, or question the use-case boundary.
 - A pure-tier project reaching for a UI-framework assembly: broken boundary. The reference belongs in Adapters behind a Contracts interface.
 - An Engine calling a Manager: forbidden. Dependencies run one way, downward.
-- A `<summary>` running to a paragraph or restating the name: the doc comment drifted from label to essay.
+- A doc-comment summary running to a paragraph or restating the name: the doc comment drifted from label to essay.
 - A shared symbol changed without visiting its call sites, or a touched component's recorded invariant (an ADR's guarantee, a pinned diagram) shifting silently: the blast radius is escaping the diff.
 
 Drift is a signal. When code and architecture disagree, resolve it out loud: fix the code, revise the design through `pipeline-stg2-volatilities` or `pipeline-stg3-architecture`, or record a new ADR when it is one. When the plan no longer holds, re-plan through `pipeline-stg5-implementation-planning`. Never diverge silently.
@@ -120,11 +121,13 @@ Drift is a signal. When code and architecture disagree, resolve it out loud: fix
 - One conventional commit per unit (`feat`, `test`, `refactor`); imperative, present tense; scope encouraged.
 - Suggest the subject and stop. The developer owns the commit. Take the next unit.
 
-## Layer-to-project mapping (default C#/WPF stack)
+## Layer-to-project mapping
 
-- **Client** -> the WPF app project (Humble Object Views, ViewModels, input wiring) plus `Adapters` (Contracts implementations using WPF/framework types).
-- **Managers and Engines** -> pure C# class libraries referencing only `Contracts`.
-- **ResourceAccess** -> pure C# class libraries exposing business verbs; the mechanism (file, DB, HTTP, serializer) stays behind the interface in `Adapters`.
+The stack profile names the project kinds (C# profile: guide § Stack profile).
+
+- **Client** -> the UI app project (Humble Object Views, ViewModels, input wiring) plus `Adapters` (Contracts implementations using UI-framework types).
+- **Managers and Engines** -> pure libraries referencing only `Contracts`.
+- **ResourceAccess** -> pure libraries exposing business verbs; the mechanism (file, DB, HTTP, serializer) stays behind the interface in `Adapters`.
 - **Resource** -> external systems: databases, filesystem, queues, third-party services.
 - **Contracts** -> the interfaces and DTOs every arrow terminates on.
 - **Utilities** -> cross-cutting services (logging, pub/sub, security, configuration) in the composition root.

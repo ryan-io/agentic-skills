@@ -30,7 +30,7 @@ Hand the validator these and nothing else; never the author's rationale or sessi
 - the built-code entry points and the diff for the increment;
 - the gate verdicts and verifier reports from Gates A, B, and C;
 - the governing records: the ADRs and business rules that bind the system, found index-first (`docs/adr/adr-index.md`, `docs/business-rules/br-index.md`);
-- the project's build and test commands (default `dotnet build` / `dotnet test`).
+- the project's build and test commands (named in Repo Signals, `research.instructions.md`).
 
 A missing input is a finding, not a reason to skip. A run with no Gate C verdict gets Gate C first, through `pipeline-stage-review`.
 

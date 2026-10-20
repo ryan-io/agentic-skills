@@ -107,7 +107,7 @@ Handle the report under the prime directive. Reconcile a grounded deviation into
 
 ## Step 3a (post-impl): Gate C
 
-Once the project's build and test commands are green (default `dotnet build` / `dotnet test`), invoke `pipeline-stage-review` at Gate C over the diff, the built-code entry points, the design doc (plan and Built log included), and the record list, never this run's rationale. Implement each must-fix through `pipeline-stg6-implementation` (a regression test where the gap was a missing test), re-run the gate, and never pass with an open must-fix. Tracked debt becomes a row through `tech-debt`.
+Once the project's build and test commands are green (named in Repo Signals, `research.instructions.md`), invoke `pipeline-stage-review` at Gate C over the diff, the built-code entry points, the design doc (plan and Built log included), and the record list, never this run's rationale. Implement each must-fix through `pipeline-stg6-implementation` (a regression test where the gap was a missing test), re-run the gate, and never pass with an open must-fix. Tracked debt becomes a row through `tech-debt`.
 
 - Once Gate C closes, invoke `pipeline-final-validation` (it spawns `pipeline-validator` where subagents exist). A FAIL routes each finding to its owning stage and re-validates once.
 

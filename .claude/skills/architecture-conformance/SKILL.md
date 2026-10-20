@@ -20,7 +20,7 @@ Gate C proves each increment against its own design; nothing re-proves the sum. 
 - Open `docs/systems/` (its index first, where one exists) for the canonical layer per system.
 - Open `docs/adr/adr-index.md`, then only the ADRs that bind layering, seams, and the purity boundary.
 - Read the `## Architecture` section of each landed `docs/design/{slug}-design.md`: what the code claims to implement.
-- Build the project-reference graph from the `.csproj` files (`rg -n '<ProjectReference' -g '*.csproj'`), never from memory. Each project's layer comes from its name or the systems map.
+- Build the project-reference graph from the build manifests, never from memory. C# profile example: `rg -n '<ProjectReference' -g '*.csproj'`. Each project's layer comes from its name or the systems map.
 - Read source with `rg` and targeted reads, not whole-directory scrapes.
 
 **Fan-out.** A full sweep splits into lanes, one check family each, read-only.
@@ -30,9 +30,9 @@ Gate C proves each increment against its own design; nothing re-proves the sum. 
 
 ## The checks
 
-1. **Naming.** Every public service type suffixed `Manager`, `Engine`, or `Access` sits in the layer its suffix claims (`rg -n 'class \w+(Manager|Engine|Access)\b' -g '*.cs'`; the containing project fixes the layer). Gerund (-ing) prefixes appear only on Engines. A service named for a business function rather than the volatility it encapsulates is a finding even when it compiles and passes tests.
+1. **Naming.** Every public service type suffixed `Manager`, `Engine`, or `Access` sits in the layer its suffix claims (`rg -n 'class \w+(Manager|Engine|Access)\b'` over the stack's source files; the containing project fixes the layer). Gerund (-ing) prefixes appear only on Engines. A service named for a business function rather than the volatility it encapsulates is a finding even when it compiles and passes tests.
 2. **Dependency direction.** All project references point inward. `Contracts` references nothing project-owned. A reversed or sideways reference is a High finding.
-3. **Purity boundary.** No business-tier project (Contracts, Managers, Engines, ResourceAccess) references a UI-framework assembly or package. Default C#/WPF stack: `PresentationFramework`, `PresentationCore`, `WindowsBase`, `System.Windows.*`, `UseWPF` in the csproj. Check both the csproj and `using` lines; the project's own ADRs name its UI framework.
+3. **Purity boundary.** No business-tier project (Contracts, Managers, Engines, ResourceAccess) references a UI-framework assembly, module, or package. Check both the build manifest and the import lines. The project's own ADRs name its UI framework; the stack profile names its assemblies (C# profile: guide § Stack profile).
 4. **Call rules (closed architecture).** Trace each Manager, Engine, and ResourceAccess interface's call sites with `rg`:
    - Clients call only Managers, one Manager per use case.
    - A Manager reaches a peer Manager only as a queued handoff, never synchronously mid-use-case.
@@ -41,7 +41,7 @@ Gate C proves each increment against its own design; nothing re-proves the sum. 
    - ResourceAccess exposes business verbs (`GetCustomer`, `SaveOrder`), not CRUD or I/O verbs leaking the resource (`ExecuteSql`, `ReadFile`).
    - Only Managers publish events; only Clients and Managers subscribe. Utilities are open to all.
 5. **Contracts termination.** Cross-layer dependencies go through `Contracts` interfaces. A concrete type from one layer in another layer's signatures is a leak, even where the reference graph allows it. Constructor injection only; a service locator or static accessor in business logic is a finding.
-6. **Static mutable state.** Candidates: `rg -n --pcre2 '\bstatic\s+(?!readonly|class|void|async|extern|partial)[\w<>\[\],?. ]+\s+\w+\s*(=[^>]|;|\{\s*get;\s*set)' -g '*.cs'`. Judge each hit: a mutable static field or settable static property in the business tier is a finding; constants and immutable caches are not.
+6. **Static mutable state.** Candidates come from an `rg` over the source for static or module-level mutable declarations. C# profile example: `rg -n --pcre2 '\bstatic\s+(?!readonly|class|void|async|extern|partial)[\w<>\[\],?. ]+\s+\w+\s*(=[^>]|;|\{\s*get;\s*set)' -g '*.cs'`. Judge each hit: a mutable static field or settable static property in the business tier is a finding; constants and immutable caches are not.
 7. **Map correspondence.** Every business-tier project has its row in the systems map with its path recorded. Every service named in a landed `## Architecture` section exists in code, or is carried explicitly as debt or a future system. Route gaps to `system-map`.
 
 ## The report

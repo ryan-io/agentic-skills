@@ -37,7 +37,7 @@ Give the reviewer exactly two things:
 
 Never give it the author's rationale, session narration, chat history, or the conclusion the design argued for. The reviewer re-derives what the design is trying to do from the doc, then judges whether it does it.
 
-Reviewer tool access: read-only for Gates A and B; Gate C adds build-and-test (`dotnet build`, `dotnet test` on the default stack).
+Reviewer tool access: read-only for Gates A and B; Gate C adds build-and-test (the build and test commands named in Repo Signals, `research.instructions.md`).
 
 ## Invoking the reviewer, per environment
 
@@ -83,7 +83,7 @@ A reviewer can be wrong too: a misread section, an invented constraint, an infla
 
 ## Gate C: after implementation, the post-build review
 
-- Fires once the build is green (default stack: `dotnet build` clean, NUnit suite passing via `dotnet test`).
+- Fires once the build is green: the Repo Signals build and test commands both exit 0.
 - Hand `gate-c-reviewer` the diff, the built-code entry points, the design doc (including `## Implementation Plan` and `## Built log`), and the record list.
 - Lenses: correctness, design fidelity, plan completeness, the purity boundary (no pure-tier UI-framework reference), static-lifecycle safety (no static mutable state), robustness and test gaps, the tuning surface (no knob hardcoded that the plan put on a config seam), impact and problem fit, simplicity.
 - Verdict: CONFIRMED or REFUTED. The reviewer never fixes.
