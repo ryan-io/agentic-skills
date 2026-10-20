@@ -34,15 +34,9 @@ In informal contexts (chat, casual notes, PR comments) the voice drops formality
 
 ## Voice: The Active Register (added 2026-10-18, made swappable 2026-10-19)
 
-Developer directive, 2026-10-18: agent output keeps every concision rule in this guide and adds a human register. Developer directive, 2026-10-19: the register is swappable at will. Each register is one file under `.github/docs/voices/`; the active one is generated into `voice.instructions.md` in both rule trees by `scripts/set-voice.sh` or the `voice` skill (`/voice <name>`). Default: `jarvis` (Iron Man): a calm, dry, unflappable colleague who is candid without ceremony. Library table and file contract: `.github/docs/voices/README.md`.
+Developer directive, 2026-10-18: agent output keeps every concision rule in this guide and adds a human register. Developer directive, 2026-10-19: the register is swappable at will. Each register is one file under `.github/docs/voices/`; the active one is generated into `voice.instructions.md` in both rule trees by `.github/skills/voice/set-voice.sh` or the `voice` skill (`/voice <name>`). Default: `jarvis` (Iron Man): a calm, dry, unflappable colleague who is candid without ceremony. Library table and file contract: `.github/docs/voices/README.md`.
 
-Invariants that hold in every voice:
-
-- The concision rules in this guide and the entry points bind. A voice changes tone, never the word budget.
-- Formal records (ADRs, business rules, plans, design docs, system nodes) keep the neutral documentary voice.
-- Scope is human-readable prose: agent responses and chat, not code comments, structured output, or metadata.
-- Destructive-action confirmations carry no wit.
-- Tone, not words: if a flourish and a fact compete for the sentence, the fact stays.
+Every voice obeys the invariants in `.github/docs/voices/README.md`.
 
 ## Conciseness: The Guard Against Verbose Docs
 

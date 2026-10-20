@@ -8,10 +8,10 @@ A generic agent harness: a principal-engineer operating stance, a staged volatil
 2. Wire the sync into the project's git hooks:
    - Existing hook infrastructure: after `git submodule update`, add `sh <submodule-path>/hooks/sync-agentic-skills.sh <submodule-path>` (in post-merge, post-checkout, and post-rewrite; `git pull --rebase` fires post-rewrite, not post-merge).
    - Otherwise: copy `hooks/git-hooks/post-merge`, `post-checkout`, and `post-rewrite` into a committed hooks dir and run `git config core.hooksPath <dir>` once per clone. The hook files need no edits, but must stay executable (`git update-index --chmod=+x <dir>/post-merge <dir>/post-checkout <dir>/post-rewrite`); git silently skips a non-executable hook.
-   - Add `<dir>/* text eol=lf` to the project's `.gitattributes`. This repo's own attribute protects only the submodule checkout; without the consumer-side rule, a fresh Windows clone with `core.autocrlf=true` checks the copied hooks out CRLF and they fail under POSIX sh.
+   - Add `<dir>/* text eol=lf` and `.github/skills/**/*.sh text eol=lf` to the project's `.gitattributes`; the second line keeps the synced `set-voice.sh` runnable under sh. This repo's own attribute protects only the submodule checkout; without the consumer-side rule, a fresh Windows clone with `core.autocrlf=true` checks the copied hooks out CRLF and they fail under POSIX sh.
 3. Run the first sync manually; adding the submodule fires no hook: `sh <submodule-path>/hooks/sync-agentic-skills.sh <submodule-path>`.
 4. Commit synced changes. Never gitignore them: Copilot on github.com only sees committed content.
-5. Fill `research.instructions.md` Repo Signals (language, framework, build and test commands, architecture style) in the consuming project's own copy of the rule, or in a project-own `repo-signals.instructions.md`.
+5. Fill `research.instructions.md` Repo Signals (language, framework, build and test commands, architecture style) in the consuming project's own copy of the rule, or in a project-own `repo-signals.instructions.md`. Name the stack profile there too: `csharp`, `lua`, or `generic`.
 6. Commit a CI drift check (recommended for teams). No hook fires on a fast-forward `git pull --rebase`, and a clone that never ran `git config core.hooksPath` drifts silently; CI catches both:
 
    ```yaml
@@ -34,8 +34,9 @@ For a chat-only or non-git context, copy `CLAUDE.md` alone: it carries the opera
 Sync semantics (`hooks/sync-agentic-skills.sh`, git + tar only):
 
 - Overwrites only files this repo ships; deletes nothing. Project-own files under `.github/` and `.claude/` survive; give additions distinct names.
-- Seeds `CLAUDE.md` and `.github/copilot-instructions.md` only when absent; a project's own copies are never overwritten. Merge central updates into them manually.
-- Edit synced files in this repo only; the next sync overwrites local edits.
+- Seeds `CLAUDE.md`, `.github/copilot-instructions.md`, and the generated `voice.instructions.md` (both trees) only when absent; a project's own copies are never overwritten. Merge central updates into the entry points manually; re-run `/voice <name>` to pick up a changed voice file.
+- Migration (2026-10-19): a project synced before this date may hold a `.claude/settings.json` with a SessionStart hook calling `scripts/link-harness.ps1`, which consumers do not have. Delete that hook; the sync no longer ships the file.
+- Edit synced files in this repo only; the next sync overwrites local edits, except the seed-once files above.
 
 ```text
 .github/
@@ -51,7 +52,7 @@ Sync semantics (`hooks/sync-agentic-skills.sh`, git + tar only):
   rules/                   <- mirror of .github/instructions
 CLAUDE.md                  <- Claude Code entry point (seeded once)
 hooks/                     <- sync script, mirror script, hook files (never synced into projects)
-scripts/                   <- link-harness.ps1 (machine-wide junctions), set-voice.sh (swap the voice)
+scripts/                   <- link-harness.ps1 (machine-wide junctions; never synced into projects)
 ```
 
 ## Discovery: who reads what
@@ -147,7 +148,7 @@ Universal (load everywhere): `agent-guardrails`, `code-standards`, `design-princ
 - **Guardrails.** Ask-do-not-guess, options before answers, pipeline first, commit workflow, load-bearing paths, subagent spawning, coding delegation (all code is written by an Opus 5.5 worker with a fresh context, never by the orchestrator seat): `agent-guardrails.instructions.md`.
 - **Stack profiles.** Stack-neutral by default. A project names its profile in `research.instructions.md` Repo Signals: `csharp` (`csharp-code-standards.instructions.md` plus the guide's Stack profile section), `lua`, or `generic` (`code-standards` alone). The layered architecture vocabulary (Client / Managers / Engines / ResourceAccess / Resources + Utilities, composition-root DI against `Contracts`, a pure business tier) is language-neutral. Project ADRs and instruction files override.
 - **Writing.** Concise Technical Writing section of the entry points; `.github/docs/writing-voice-guide.md`; no em dashes; tags in skill frontmatter sorted.
-- **Voice.** The conversational register is one generated rule, `voice.instructions.md`, built from `.github/docs/voices/<name>.md`. Swap with `/voice <name>` in a session or `sh scripts/set-voice.sh <name>` (`--list`, `--current`). Shipped: `jarvis` (default), `neutral`, `terse`, `mentor`. A voice changes tone only; concision rules and neutral formal records hold in every voice.
+- **Voice.** The conversational register is one generated rule, `voice.instructions.md`, built from `.github/docs/voices/<name>.md`. Swap with `/voice <name>` in a session, or `sh .github/skills/voice/set-voice.sh <name>` (`--list`, `--current`). The script ships with the skill, so a consuming project can swap too, and its choice survives the sync. Shipped: `jarvis` (default), `neutral`, `terse`, `mentor`. Invariants every voice obeys: `.github/docs/voices/README.md`.
 
 ## Extending
 

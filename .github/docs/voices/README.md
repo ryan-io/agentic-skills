@@ -1,6 +1,6 @@
 # Voice library
 
-One file per conversational register. The active one is generated into `voice.instructions.md` in both rule trees by `scripts/set-voice.sh`; the `voice` skill does the same from inside a session (`/voice <name>`).
+One file per conversational register. The active one is generated into `voice.instructions.md` in both rule trees by `.github/skills/voice/set-voice.sh`; the `voice` skill does the same from inside a session (`/voice <name>`).
 
 | Voice | Summary |
 |---|---|
@@ -23,3 +23,4 @@ The generator writes these into every `voice.instructions.md` header, so a voice
 - Formal records (ADRs, business rules, design docs, plans, system nodes) keep a neutral documentary voice.
 - Scope is human-readable prose: not code comments, structured output, or metadata.
 - Destructive-action confirmations carry no wit in any voice.
+- Tone, not words: if a flourish and a fact compete for the sentence, the fact stays.

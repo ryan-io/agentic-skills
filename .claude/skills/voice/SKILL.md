@@ -6,7 +6,7 @@ description: >
   you go", "what voices are there", or "add a voice". Lists the library under
   .github/docs/voices/, adopts the chosen register for the rest of the session immediately, and
   persists it by regenerating voice.instructions.md in both rule trees through
-  scripts/set-voice.sh. Never changes the concision standard; formal records stay neutral.
+  its own set-voice.sh. Never changes the concision standard; formal records stay neutral.
 tags: [process, skill, writing]
 ---
 
@@ -23,7 +23,7 @@ The tone an agent speaks in is one generated rule file, `voice.instructions.md`,
 ## Swap
 
 1. Confirm the file exists: `.github/docs/voices/<name>.md`. If not, list the library and stop.
-2. Persist: run `sh scripts/set-voice.sh <name>` from the harness repo root. It regenerates `.github/instructions/voice.instructions.md` and `.claude/rules/voice.instructions.md` identically. Where no shell is available (Copilot chat in an IDE), say so and copy the file body under the generated header by hand into both paths, matching an existing generated file.
+2. Persist: run `sh .github/skills/voice/set-voice.sh <name>` from the repo root. This works in the harness repo and in a consuming project. The sync ships the skill and the library, and never overwrites a consumer's generated rule. It regenerates `.github/instructions/voice.instructions.md` and `.claude/rules/voice.instructions.md` identically. Where no shell is available (Copilot chat in an IDE), say so and copy the file body under the generated header by hand into both paths, matching an existing generated file.
 3. Adopt now: read `.github/docs/voices/<name>.md` and speak in that register for the rest of this session. The rule file loads on its own in the next session.
 4. Confirm in one line, in the new voice.
 
@@ -35,11 +35,10 @@ The tone an agent speaks in is one generated rule file, `voice.instructions.md`,
 
 ## Revise a voice
 
-Read the saved file first, apply the requested change, keep the rest and the contract, confirm before overwriting, then re-run `sh scripts/set-voice.sh <name>` if it is the active voice.
+Read the saved file first, apply the requested change, keep the rest and the contract, confirm before overwriting, then re-run `sh .github/skills/voice/set-voice.sh <name>` if it is the active voice.
 
 ## Boundaries
 
-- A voice changes tone, never the word budget. The concision rules in the entry points bind in every voice.
-- Formal records (ADRs, business rules, design docs, plans, system nodes) keep a neutral documentary voice regardless.
-- `voice.instructions.md` is generated. This skill and `scripts/set-voice.sh` are the only sanctioned writers; hand edits go to the library file (`agent-guardrails`, Instruction File Integrity).
+- A voice changes tone only. The invariants every voice obeys live in `.github/docs/voices/README.md`.
+- `voice.instructions.md` is generated. This skill and `.github/skills/voice/set-voice.sh` are the only sanctioned writers; hand edits go to the library file (`agent-guardrails`, Instruction File Integrity).
 - Never commit. Suggest `chore(voice): set active voice to <name>` and stop.

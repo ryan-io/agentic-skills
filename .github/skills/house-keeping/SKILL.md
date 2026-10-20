@@ -3,7 +3,9 @@ name: house-keeping
 description: >
   Sweep the documentation corpora: verify every *-index.md under docs/ against disk, fix dead
   links and verifiable stale facts on the spot, review ADRs and design docs for staleness, and
-  flag ideas and research notes left unreferenced past an age threshold. Use on "run
+  flag ideas and research notes left unreferenced past an age threshold, and check the
+  harness's hand-maintained lists (discover catalog, voice table, entry-point skill
+  names). Use on "run
   housekeeping", "clean up the docs", "are the indexes stale", "find dead links", or as a
   periodic pass. Reports findings; never commits.
 tags: [documentation, index, process, skill]
@@ -28,7 +30,8 @@ A periodic maintenance pass over `docs/`. The mechanical half proves what a sear
    Judge each against the code and the project's stated goal, where one is recorded. Fix a dead path or stale cross-reference directly. Never rewrite a decision: one that no longer holds becomes a proposed amendment or supersession in the report.
 6. **Design-doc staleness.** For each `docs/design/{slug}-design.md`, check that the code it describes exists and that its `## Built log` is not contradicted by later ADRs or code. A design doc whose system was absorbed, cut, or redesigned without an update is a finding; route it to the developer or the owning pipeline stage.
 7. **Aged ideas and research notes.** Flag each idea or research note older than N days (default 30; ask if the project sets its own) that no other record references (`rg -l <filename-or-slug> docs`). Propose one of: graduate it into a record, refine it, or mark it superseded. This step surfaces candidates only; the developer decides.
-8. **Close.** Run the project's validation commands, where any exist, and deliver the report.
+8. **Harness lists.** Three hand-maintained lists must match disk. The `discover` catalog: run its freshness check against `.github/skills`, `.github/agents`, `.github/instructions`, and `.github/docs/voices`. The voice table in `.github/docs/voices/README.md`: one row per voice file. The skill names the entry points cite (`CLAUDE.md`, `.github/copilot-instructions.md`): every skill on disk is named. In the central agentic-skills repo, fix a gap on the spot and run `sh hooks/mirror-trees.sh` after touching a skill. In a consuming project, fix only the entry points, which the project owns; report catalog or voice-table drift for the central repo to fix.
+9. **Close.** Run the project's validation commands, where any exist, and deliver the report.
 
 ## The report
 

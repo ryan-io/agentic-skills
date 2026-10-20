@@ -3,3 +3,6 @@
 # them under POSIX sh on macOS/Linux clones and CI. Applies to git archive too,
 # which the sync script uses.
 hooks/** text eol=lf
+# Every shell script here ships to consumers or runs under POSIX sh, so all
+# of them check out LF.
+**/*.sh text eol=lf
